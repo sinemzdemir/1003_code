@@ -11,7 +11,7 @@ We construct model which comprise of 4 level which can be use independent or rel
 Edit the configuration file **holoprotRep_binary_label_config.yaml** by changing parameters as desired and setting paths of your file/files 
 
 # Example of configuration file
-|#Command             | #Value |
+| # Command             | # Value |
 |--------------------|-------|
 |**choice_of_task_name:**| [fuse_representations,prepare_datasets,model_training,model_test] |
 |**fuse_representations:** |   
