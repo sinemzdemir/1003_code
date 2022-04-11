@@ -13,14 +13,24 @@ Edit the configuration file **holoprotRep_binary_label_config.yaml** by changing
 # Example of configuration file
 |Command             | Value |
 |--------------------|-------|
-|choice_of_task_name: | [fuse_representations,prepare_datasets,model_training,model_test] |
-|fuse_representations:    representation_files: | [/media/DATA/home/sinem/yayin_calismasi/SeqVec_dataframe_multi_col.csv, /media/DATA/home/sinem/yayin_calismasi/tcga_embedding_dataframe_multi_col.csv] |
+|**choice_of_task_name:**| [fuse_representations,prepare_datasets,model_training,model_test] |
+|**fuse_representations:** |   
+| representation_files: | [/media/DATA/home/sinem/yayin_calismasi/SeqVec_dataframe_multi_col.csv, /media/DATA/home/sinem/yayin_calismasi/tcga_embedding_dataframe_multi_col.csv] |
 |       min_fold_number: |  None |
 |       representation_names: | [seqvec, tcga]    | 
-|prepare_datasets:  |
+|**prepare_datasets:**  |
 |annotation_files: |  [/media/DATA/home/sinem/low_data/cellular_component_Low_Normal.csv,/media/DATA/home/sinem/low_data/molecular_function_Low_Normal.csv] |
         | prepared_representation_file: | /media/DATA/home/sinem/yayin_calismasi/results/seqvec_tcga_fused_representations_dataframe_multi_col.csv |
         | representation_names: | [seqvec, tcga] |
+|**model_training:** |
+       | representation_names:|  [seqvec, tcga]   |
+       | auto: | True |
+       | prepared_directory_path: | [/media/DATA/home/sinem/yayin_calismasi/results/] |
+       | classifier_name: |  ["Neural_Network","RandomForestClassifier"] |
+|**model_test:**|
+        | representation_names: | [seqvec, tcga] |
+        | prepared_directory_path: |  [] |             
+        | best_parameter_file: |  [] |
 # Dependencies
 1.	Python 3.7.3
 2.	pandas 1.1.4
