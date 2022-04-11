@@ -17,6 +17,10 @@ Edit the configuration file **holoprotRep_binary_label_config.yaml** by changing
 |fuse_representations:    representation_files: | [/media/DATA/home/sinem/yayin_calismasi/SeqVec_dataframe_multi_col.csv, /media/DATA/home/sinem/yayin_calismasi/tcga_embedding_dataframe_multi_col.csv] |
 |       min_fold_number: |  None |
 |       representation_names: | [seqvec, tcga]    | 
+|prepare_datasets:  |
+|annotation_files: |  [/media/DATA/home/sinem/low_data/cellular_component_Low_Normal.csv,/media/DATA/home/sinem/low_data/molecular_function_Low_Normal.csv] |
+        | prepared_representation_file: | /media/DATA/home/sinem/yayin_calismasi/results/seqvec_tcga_fused_representations_dataframe_multi_col.csv |
+        | representation_names: | [seqvec, tcga] |
 # Dependencies
 1.	Python 3.7.3
 2.	pandas 1.1.4
