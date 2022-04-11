@@ -1,4 +1,4 @@
-# 1003# protein_kesfi_schedule
+# 1003 protein_kesfi_schedule
 HoloprotRep aim to fuse protein representations in order to prepare datasets which will be utilized for model traing and test
 We construct model which comprise of 4 level which can be use independent or related
 1.	fuse_representations
@@ -8,26 +8,14 @@ We construct model which comprise of 4 level which can be use independent or rel
 
 # How to run HoloprotRep 
 
-Edit the configuration file "configuration.yaml" by changing parameters as desired and setting paths of your file/files 
+Edit the configuration file **holoprotRep_binary_label_config.yaml** by changing parameters as desired and setting paths of your file/files 
 
 # Example of configuration file
-choice_of_task_name: [fuse_representations,prepare_datasets,model_training,model_test] \
-    fuse_representations:\
-        representation_files: [/media/DATA/home/sinem/yayin_calismasi/SeqVec_dataframe_multi_col.csv, /media/DATA/home/sinem/yayin_calismasi/tcga_embedding_dataframe_multi_col.csv]\
-        min_fold_number:  None\
-        representation_names:  [seqvec, tcga]\       
-    prepare_datasets:  
-        annotation_files:  [/media/DATA/home/sinem/low_data/cellular_component_Low_Normal.csv,/media/DATA/home/sinem/low_data/molecular_function_Low_Normal.csv]\
-        prepared_representation_file:  /media/DATA/home/sinem/yayin_calismasi/results/seqvec_tcga_fused_representations_dataframe_multi_col.csv\
-        representation_names:  [seqvec, tcga]\
-    model_training:\
-        representation_names:  [seqvec, tcga]\   
-        auto:  True\
-        prepared_directory_path:  [] \
-        classifier_name:  ["Neural_Network","RandomForestClassifier"]\ 
-    model_test:\           
-        best_parameter_file:  []
-
+|Command             | Value |
+|--------------------|-------|
+|choice_of_task_name | [fuse_representations,prepare_datasets,model_training,model_test] |
+|--------------------| ------|
+|fuse_representations|
 # Dependencies
 1.	Python 3.7.3
 2.	pandas 1.1.4
