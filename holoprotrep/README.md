@@ -1,4 +1,4 @@
-# 1003 protein_kesfi_schedule (multilabel)
+# 1003 protein_kesfi_schedule (multilabel,binary)
 HoloprotRep aim to fuse protein representations in order to prepare datasets which will be utilized for model traing and test
 We construct model which comprise of 4 level which can be use independent or related
 1.	fuse_representations
