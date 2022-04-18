@@ -19,7 +19,7 @@ Edit the configuration file **holoprotRep_binary_label_config.yaml** by changing
 |       min_fold_number: |  None |
 |       representation_names: | [seqvec, tcga]    | 
 |**prepare_datasets:**  |
-|annotation_files: |  [/media/DATA/home/sinem/low_data/cellular_component_Low_Normal.csv,/media/DATA/home/sinem/low_data/molecular_function_Low_Normal.csv] |
+|annotation_files: |  [/media/DATA/home/sinem/low_data/cellular_component_Low_Normal.csv, /media/DATA/home/sinem/low_data/molecular_function_Low_Normal.csv] |
 | prepared_representation_file: | /media/DATA/home/sinem/yayin_calismasi/results/seqvec_tcga_fused_representations_dataframe_multi_col.csv |
 | representation_names: | [seqvec, tcga] |
 |**model_training:** |
