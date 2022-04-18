@@ -1,5 +1,5 @@
 parameters:
-    choice_of_task_name:  [model_training,prediction]
+    choice_of_task_name:  [model_training]
     fuse_representations:
         representation_files: [/media/DATA2/sinem/HoloProtReti_modal_rep_ae_multi_col_256.csv]
         min_fold_number:  None

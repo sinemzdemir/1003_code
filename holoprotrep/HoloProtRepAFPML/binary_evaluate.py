@@ -41,7 +41,7 @@ def compute_roc(labels, preds):
     return roc_auc
     
 
-def evaluate(kf, protein_representation,model_label_pred_lst, label_lst, classifier_name,representation_name,protein_and_representation_dictionary,file_name,index,classifier_type,mlt="binary"):
+def evaluate(kf, protein_representation,model_label_pred_lst, label_lst,f_max_cv, classifier_name,representation_name,protein_and_representation_dictionary,file_name,index,classifier_type,mlt="binary"):
 
 
     acc_cv = []
@@ -67,9 +67,9 @@ def evaluate(kf, protein_representation,model_label_pred_lst, label_lst, classif
     std_rc_ma_cv = []
     std_rc_we_cv = []
     std_hamm_cv = []
-    
+    std_f1_max_cv=[]
     GO_ids=[]   
-
+    std_f1_max_cv=[]
     protein_representation_array = np.array(list(protein_representation['Vector']), dtype=float)          
       
     protein_name=[]    
@@ -94,7 +94,7 @@ def evaluate(kf, protein_representation,model_label_pred_lst, label_lst, classif
     y_test_list = []
     auc_cv=[]
     std_auc_cv=[]
-   
+    f_ma_cv=[]
     for fold_index in range(len(model_label_pred_lst)):
   
         tn, fp, fn, tp = confusion_matrix(label_lst[fold_index], model_label_pred_lst[fold_index]).ravel()         
@@ -133,6 +133,7 @@ def evaluate(kf, protein_representation,model_label_pred_lst, label_lst, classif
     std_acc_cv.append(np.std(acc_cv))
     std_f1_mi_cv.append(np.std(f1_mi_cv))
     std_f1_ma_cv.append(np.std(f1_ma_cv))
+    std_f1_max_cv.append(np.std(f_max_cv))
     std_f1_we_cv.append(np.std(f1_we_cv))
     std_pr_mi_cv.append(np.std(pr_mi_cv))
     std_pr_ma_cv.append(np.std(pr_ma_cv))
@@ -145,7 +146,7 @@ def evaluate(kf, protein_representation,model_label_pred_lst, label_lst, classif
     
     result_list.append(
             [representation_name, classifier_name, acc_cv, std_acc_cv, f1_mi_cv,
-             std_f1_mi_cv, f1_ma_cv, std_f1_ma_cv, f1_we_cv, std_f1_we_cv, pr_mi_cv, std_pr_mi_cv, pr_ma_cv,
+             std_f1_mi_cv, f1_ma_cv, std_f1_ma_cv,f_max_cv,std_f1_max_cv, f1_we_cv, std_f1_we_cv, pr_mi_cv, std_pr_mi_cv, pr_ma_cv,
              std_pr_ma_cv, pr_we_cv, std_pr_we_cv, rc_mi_cv, std_rc_mi_cv, rc_ma_cv, std_rc_ma_cv, rc_we_cv,
              std_rc_we_cv, hamm_cv, std_hamm_cv,auc_cv,std_auc_cv, mcc_cv])
     mean_result_list.append(
@@ -153,7 +154,7 @@ def evaluate(kf, protein_representation,model_label_pred_lst, label_lst, classif
                                                       np.mean(f1_mi_cv),
                                                       np.mean(std_f1_mi_cv),
                                                       np.mean(f1_ma_cv),
-                                                      np.mean(std_f1_ma_cv),
+                                                      np.mean(std_f1_ma_cv),np.mean(f_ma_cv),np.mean(std_f1_max_cv),
                                                       np.mean(f1_we_cv),
                                                       np.mean(std_f1_we_cv),
                                                       np.mean(pr_mi_cv),
