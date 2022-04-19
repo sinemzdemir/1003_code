@@ -25,45 +25,7 @@ compare it other methods from literature.
 3.	scikit-learn 0.22.1.
 4.	Scikit-MultiLearn
 
-- # Example of configuration file:
-
-##Representation name (used for naming output files):
-representation_name: AAC
-#representation_name: LEARNED-VEC
-#representation_name: T5
-
-#Benchmarks (should be one of the "similarity","family","function","affinity","all"):
-# "similarity" for running protein semantic similarity inference benchmark
-# "function" for running ontology-based function prediction benchmark
-# "family" for running drug target protein family classification benchmark
-# "affinity" for running protein-protein binding affinity estimation benchmark
-# "all" for running all benchmarks
-benchmark: all
-
-#Path of the file containing representation vectors of UniProtKB/Swiss-Prot human proteins:
-representation_file_human: ../data/representation_vectors/AAC_UNIPROT_HUMAN.csv
-#representation_file_human: ../data/representation_vectors/LEARNED-VEC_UNIPROT_HUMAN.csv
-#representation_file_human: ../data/representation_vectors/T5_UNIPROT_HUMAN.csv
-
-#Path of the file containing representation vectors of samples in the SKEMPI dataset: 
-representation_file_affinity: ../data/representation_vectors/skempi_aac_representation_multi_col.csv
-#representation_file_affinity: ../data/representation_vectors/skempi_learned-vec_representation_multi_col.csv
-#representation_file_affinity: ../data/representation_vectors/skempi_t5_representation_multi_col.csv
-
-#Semantic similarity inference benchmark dataset (should be a list that includes any combination of "Sparse", "200", and "500"):
-similarity_tasks: ["Sparse","200","500"]
-
-#Ontology-based function prediction benchmark dataset in terms of GO aspect (should be one of the following: "MF", "BP", "CC", or "All_Aspects"):
-function_prediction_aspect: All_Aspects
-
-#Ontology-based function prediction benchmark dataset in terms of size-based-splits (should be one of the following: "High", "Middle", "Low", or "All_Data_Sets")
-function_prediction_dataset: All_Data_Sets
-
-#Drug target protein family classification benchmark dataset in terms of similarity-based splits (should be a list that includes any combination of "nc", "uc50", "uc30", and "mm15")
-family_prediction_dataset: ["nc","uc50","uc30","mm15"]
-
-#Detailed results (can be True or False)
-detailed_output: False
+- # Example of binary classification configuration file please read binary_classification.md, for example of multilabel classification please read multilabel_classification.md
 
 
 # Definition of output files (results)
