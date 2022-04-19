@@ -4,9 +4,9 @@
 We construct model which comprise of 4 level which can be use independent or related:
 compare it other methods from literature.
  1. fuse_representations
-  2. prepare_datasets
-  3. model_training
-  4. model_test
+ 2. prepare_datasets
+ 3. model_training
+ 4. model_test
 
 # How to run HoloprotRep 
 
@@ -19,10 +19,10 @@ Step by step operation:
 - i.e., python **HoloProtRep_binary_label.py**
 
 - # Dependencies
-  1.	Python 3.7.3
-  2.	pandas 1.1.4
-  3.	scikit-learn 0.22.1.
-  4.	Scikit-MultiLearn
+ 1.	Python 3.7.3
+ 2.	pandas 1.1.4
+ 3.	scikit-learn 0.22.1.
+ 4.	Scikit-MultiLearn
 
 - Example of binary classification configuration file see documentation [binary_classification.md](binary_classification.md), for example of multilabel classification see documentation [multilabel_classification.md](multilabel_classification.md)
 
