@@ -52,3 +52,15 @@ parameters:
 
     - "training/representation_name_model_name_binary_classifier_training_predictions.tsv"
 
+
+- Test result files:
+
+   - "test/representation_names_model_name_test.tsv": training results which contains "representation_name","classifier_name", "accuracy", "std_accuracy",   "f1_micro",   "std_f1_micro", "f1_macro", "std_f1_macro","f_max", "std_f_max", "f1_weighted","std_f1_weighted","precision_micro", "std_precision_micro","precision_macro",    "std_precision_macro", "precision_weighted", "std_precision_weighted", "recall_micro", "std_recall_micro","recall_macro", "std_recall_macro", "recall_weighted",     "std_recall_weighted",  "hamming distance","std_hamming distance","auc","std_auc","matthews correlation coefficient" columns
+
+    - "test/representation_model_name_binary_classifier.pt" : saved model
+
+    - "test/representation_name_model_name_test_means.tsv" : mean of 5 fold results
+
+    - "test/model_name_representation_name_binary_classifier_best_parameter.csv"
+
+    - "test/representation_name_model_name_binary_classifier_test_predictions.tsv"
