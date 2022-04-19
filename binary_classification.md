@@ -1,5 +1,5 @@
 # Example of binary classification configuration file
---
+---
 parameters:
     # choice of task, task names can be fuse_representations,prepare_datasets,model_training,model_test
     choice_of_task_name:  [model_training,model_test]
@@ -29,4 +29,4 @@ parameters:
         model_directory:  ["../results/test/modal_rep_ae_binary_classifier_Fully Connected Neural Network.pt"] 
         
 
---
+---
