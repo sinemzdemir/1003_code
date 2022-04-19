@@ -3,12 +3,16 @@
 - HoloprotRep aim to fuse protein representations in order to prepare datasets which will be utilized for model training and test
 We construct model which comprise of 4 level which can be use independent or related:
 compare it other methods from literature.
+
 1.	fuse_representations
 2.	prepare_datasets
 3.	model_training
 4.	model_test
 
 # How to run HoloprotRep 
+
+- Step by step operation:
+-1. Clone repostory
 
 Edit the configuration file **holoprotRep_binary_label_config.yaml** by changing parameters as desired and setting paths of your file/files 
 
