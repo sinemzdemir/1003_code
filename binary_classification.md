@@ -1,7 +1,7 @@
 # Example of binary classification configuration file
 ---
 parameters:
-    # choice of task, task names can be fuse_representations,prepare_datasets,model_training,model_test
+    ## choice of task, task names can be fuse_representations,prepare_datasets,model_training,model_test
     choice_of_task_name:  [model_training,model_test]
     # representation vectors concantenation
     fuse_representations:
