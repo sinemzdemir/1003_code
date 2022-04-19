@@ -25,7 +25,7 @@ compare it other methods from literature.
 3.	scikit-learn 0.22.1.
 4.	Scikit-MultiLearn
 
-- Example of binary classification configuration file see documentation [binary_classification.md](../1003_code/binary_classification.md), for example of multilabel classification please read multilabel_classification.md
+- Example of binary classification configuration file see documentation [binary_classification.md](../binary_classification.md), for example of multilabel classification please read multilabel_classification.md
 
 
 # Definition of output files (results)
