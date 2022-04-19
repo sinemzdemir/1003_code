@@ -18,7 +18,7 @@ Step by step operation:
   5. cd intoholoprotrep run **HoloProtRep_binary_label.py** or **HoloProtRep_multi_label.py**
 - i.e., python **HoloProtRep_binary_label.py**
 
-- # Dependencies
+# Dependencies
  1.	Python 3.7.3
  2.	pandas 1.1.4
  3.	scikit-learn 0.22.1.
