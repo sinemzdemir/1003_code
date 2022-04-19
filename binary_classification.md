@@ -1,7 +1,7 @@
 parameters:
-### choice of task, task names can be fuse_representations,prepare_datasets,model_training,model_test
+    ##choice of task, task names can be fuse_representations,prepare_datasets,model_training,model_test
     choice_of_task_name:  [model_training]
-### representation vectors concantenation
+    ##representation vectors concantenation
     representation_names: [modal_rep_ae]
     
     fuse_representations:
