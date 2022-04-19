@@ -4,7 +4,7 @@
 We construct model which comprise of 4 level which can be use independent or related:
 compare it other methods from literature.
 
-- 1.	fuse_representations
+  1.	fuse_representations
 - 2.	prepare_datasets
 - 3.	model_training
 - 4.	model_test
