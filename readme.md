@@ -10,7 +10,7 @@ Step by step operation:
   2. Install dependencies(given below)
   3. Download datasets,unzip and place the folder
   4. Edit the configuration file (according to classification methods, for binary classification: **holoprotRep_binary_label_config.yaml** for multi label classification: **holoprotRep_multi_label_config.yaml**) by changing parameters as desired and setting paths of your file(s)
-  5. cd intoholoprotrep run **HoloProtRep_binary_label.py** or **HoloProtRep_multi_label.py**
+  5. cd into holoprotrep run **HoloProtRep_binary_label.py** or **HoloProtRep_multi_label.py**
 - i.e., python **HoloProtRep_binary_label.py**
 
 # Dependencies
