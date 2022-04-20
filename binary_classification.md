@@ -17,7 +17,7 @@ We compare it with  other methods from the literature.
 # Example of binary classification configuration file 
 
 
-parameters:
+Parameters:
 
     ##choice of task, task names can be fuse_representations,prepare_datasets,model_training,model_test
     
