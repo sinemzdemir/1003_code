@@ -1,14 +1,7 @@
 # HoloprotRep: Protein Representation Classification
 
 - HoloprotRep aims to construct models for protein function prediction Holoprotrep can concate protein representations in to prepare datasets  for training and testing models
-We construct a model consisting of  4 steps that can be used independently or contiguously:
-We compare it with  other methods from the literature.
- 1. fuse_representations:concatenate of protein representation vectors
- 2. prepare_datasets:Concantation of positive_sample_dataset and negative_sample_dataset for preperation of dataset which have "Entry" and multi columns representation vector and  save pickle format of dataset   
-prepare_datasets
- 3. model_training:training of prepared data.Using models are Fully Connected Neural Network,RandomForestClassifier,SVC,KNeighborsClassifier
- 4. model_test:
- 5. model_prediction
+
 
 # How to run HoloprotRep 
 
