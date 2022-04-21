@@ -112,4 +112,4 @@ def make_prediction(representation_name,data_preproceed,tested_model,classifier_
         label_predictions=pd.DataFrame(model_label_pred_lst,columns=col_names)
     
         label_predictions.insert(0, "protein_id", protein_name)                  
-        label_predictions.to_csv(path+'/prediction/'+representation_name[0]+'_'+"prediction_" +"binary_classifier"+ '_' + classifier_name[i]+".tsv",sep="\t", index=False)        
+        label_predictions.to_csv(path+'/prediction/'+representation_name+'_'+"prediction_" +"binary_classifier"+ '_' + classifier_name[i]+".tsv",sep="\t", index=False)        

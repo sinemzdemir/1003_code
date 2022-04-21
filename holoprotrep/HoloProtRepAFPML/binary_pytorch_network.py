@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 import numpy as np
 from HoloProtRepAFPML import BinaryTrainModelsWithHyperParameterOptimization
-#from HoloProtRepAFPML.BinaryTrainModelsWithHyperParameterOptimization import intersection,evaluate_annotation_f_max
+
 class Net(nn.Module):
     def __init__(self, input_size, class_number):
         super(Net, self).__init__()
@@ -48,6 +48,7 @@ def model_call(input_size, class_number):
     return model
 
 def NN(kf,protein_representation,model_label, input_size,representation_name,protein_and_representation_dictionary):
+    
     running_loss_lst_s=[]
     f_max_cv_train=[]
     f_max_cv_test=[]
@@ -65,7 +66,9 @@ def NN(kf,protein_representation,model_label, input_size,representation_name,pro
     classifier_name = "Fully Connected Neural Network"
     label_lst=[]
     protein_representation_array = np.array(list(protein_representation['Vector']), dtype=float)
+    
     for fold_train_index, fold_test_index in kf.split(protein_representation, model_label):
+        
         running_loss_lst=[]       
         class_number=1
         x_df=pd.DataFrame(protein_representation['Vector'],index=list(fold_train_index))
@@ -86,8 +89,10 @@ def NN(kf,protein_representation,model_label, input_size,representation_name,pro
         y_test = torch.tensor(model_label[fold_test_index]).to(device)
         y_test = y_test.double()
         val_loss_lst=[]
+        
         for epoch in range(900):
-            #model.train(True)
+        
+            #training
             running_loss=0.0
             output = model(x)
             batch_loss  = criterion(output, y.unsqueeze(1))
@@ -99,10 +104,11 @@ def NN(kf,protein_representation,model_label, input_size,representation_name,pro
             if epoch % 20 == 0:
                 print("Loss: {:.3f}".format(batch_loss.item()))
             running_loss_lst.append(epoch_loss)
+            #test
             with torch.no_grad():
                 model.eval()
                 val_loss=0.0      
-                out_probs = model(x_test) #.detach().numpy()
+                out_probs = model(x_test) 
                 loss_val  = criterion(out_probs, y_test.unsqueeze(1))    
                 val_loss += loss_val.item()
                 epoch_loss = running_loss / len(x_test)
@@ -124,6 +130,7 @@ def NN(kf,protein_representation,model_label, input_size,representation_name,pro
                 
         out_probs[out_probs >= 0.0] = 1
         out_probs[out_probs < 0.0] = 0       
+        
         model_label_pred_test_lst.append(out_probs.detach().numpy())
         label_lst_test.append(model_label[fold_test_index])
         
@@ -134,6 +141,7 @@ def NN(kf,protein_representation,model_label, input_size,representation_name,pro
                     continue
         fmax = 0.0
         tmax = 0.0
+        
         for t in range(1, 101):
             threshold = t / 100.0
             fscore=BinaryTrainModelsWithHyperParameterOptimization.evaluate_annotation_f_max( model_label[fold_test_index],y_test )
@@ -141,15 +149,17 @@ def NN(kf,protein_representation,model_label, input_size,representation_name,pro
                 fmax = fscore
                 tmax = threshold
             f_max_cv_test.append(fmax)
-        fmax = 0.0
-        tmax = 0.0
+            
+        fmax_test= 0.0
+        tmax_test = 0.0
         for t in range(1, 101):
             threshold = t / 100.0
             fscore=BinaryTrainModelsWithHyperParameterOptimization.evaluate_annotation_f_max( model_label[fold_train_index],y )
-            if fmax < fscore:
-                fmax = fscore
-                tmax = threshold
-            f_max_cv_train.append(fmax)
+            if fmax_test < fscore:
+                fmax_test = fscore
+                tmax_test = threshold
+            f_max_cv_train.append(fmax_test)
+            
     test_loss=[sum(x) for x in zip(*val_loss_lst_s)]
     training_loss=[sum(x) for x in zip(*running_loss_lst_s)]
     plt.figure(figsize=(10,5))

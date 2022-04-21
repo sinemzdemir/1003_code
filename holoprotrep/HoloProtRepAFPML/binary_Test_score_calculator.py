@@ -236,7 +236,7 @@ def Model_test(representation_name, integrated_dataframe,parameteter_file):
                             continue
               
            
-            paths=path+"/test"+'/'+representation_name+'_'+'binary_classifier'+'_'+classifier_name+".pt"
+            paths=path+"/test"+'/'+representation_name+'_'+classifier_name+'_'+'binary_classifier'+".pt"
             #torch.save(model,paths )
             
             # Initialize optimizer
@@ -270,7 +270,7 @@ def Model_test(representation_name, integrated_dataframe,parameteter_file):
                             continue
        
                 rep_name_and_go_id=representation_name
-            filename = path+'/'+'test'+'/'+'binary_classifier'+ '_' + classifier_name +'_test_model.joblib'
+            filename = path+'/'+'test'+'/'+classifier_name+'binary_classifier'+ '_test_model.joblib'
             classifier.fit(protein_representation_array,model_label)
             joblib.dump(classifier,filename)
             #joblib.dump(model_pipline, filename)
@@ -280,7 +280,7 @@ def Model_test(representation_name, integrated_dataframe,parameteter_file):
         label_predictions.insert(0, "protein_id", protein_name)
         #label_predictions["prediction_values"]=[i for i in ls]        
         
-        label_predictions.to_csv(path+'/'+'test'+'/'+'binary_classifier'+ '_' + classifier_name +'_test'+ "_predictions5cv.tsv",sep="\t", index=False)
+        label_predictions.to_csv(path+'/'+'test'+'/' + classifier_name + 'binary_classifier'+ '_test'+ "_predictions.tsv",sep="\t", index=False)
        
         binary_evaluate.evaluate(kf, protein_representation, model_label_pred_lst, label_lst, classifier_name,representation_name,protein_and_representation_dictionary,file_name,index,"test")
             

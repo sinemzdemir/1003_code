@@ -41,8 +41,8 @@ def compute_roc(labels, preds):
     return roc_auc
     
 
-def evaluate(kf, protein_representation,model_label_pred_lst, label_lst, classifier_name,representation_name,name_of_go_id_with_protein_names,protein_and_representation_dictionary,f_max_cv,file_name,index,classifier_type,mlt="binary"):
 
+def evaluate(kf, protein_representation, model_label_pred_lst, label_lst,f_max_cv, classifier_name,representation_name,protein_and_representation_dictionary,file_name,index_,eval_type,mlt="multilabel"):
 
     acc_cv = []
     f1_mi_cv = []
@@ -155,14 +155,15 @@ def evaluate(kf, protein_representation,model_label_pred_lst, label_lst, classif
     std_hamm_cv.append(np.std(hamm_cv))
     std_f_max_cv.append(np.std(f_max_cv))
     std_auc_cv.append(np.std(auc_cv))
-    
+   
+    classifier_name_concated="_".join(classifier_name)
     result_list.append(
-            [representation_name+name_of_go_id_with_protein_names, classifier_name, acc_cv, std_acc_cv, f_max_cv, std_f_max_cv, f1_mi_cv,
+            [representation_name, classifier_name_concated, acc_cv, std_acc_cv, f_max_cv, std_f_max_cv, f1_mi_cv,
              std_f1_mi_cv, f1_ma_cv, std_f1_ma_cv, f1_we_cv, std_f1_we_cv, pr_mi_cv, std_pr_mi_cv, pr_ma_cv,
              std_pr_ma_cv, pr_we_cv, std_pr_we_cv, rc_mi_cv, std_rc_mi_cv, rc_ma_cv, std_rc_ma_cv, rc_we_cv,
              std_rc_we_cv, hamm_cv, std_hamm_cv,auc_cv,std_auc_cv, mcc_cv])
     mean_result_list.append(
-            [representation_name+name_of_go_id_with_protein_names, classifier_name] + [np.mean(acc_cv), np.mean(std_acc_cv), np.mean(f_max_cv),
+            [representation_name, classifier_name_concated] + [np.mean(acc_cv), np.mean(std_acc_cv), np.mean(f_max_cv),
                                                       np.mean(std_f_max_cv),
                                                       np.mean(f1_mi_cv),
                                                       np.mean(std_f1_mi_cv),
@@ -188,7 +189,7 @@ def evaluate(kf, protein_representation,model_label_pred_lst, label_lst, classif
 
 
 
-    report_results_of_training.report_results_of_training(representation_name+'_'+name_of_go_id_with_protein_names,result_list,mean_result_list,classifier_name,file_name,index,classifier_type)
+    report_results_of_training.report_results_of_training(representation_name,result_list,mean_result_list,classifier_name_concated,file_name,index_,eval_type)
     
     
     return (result_list, mean_result_list)

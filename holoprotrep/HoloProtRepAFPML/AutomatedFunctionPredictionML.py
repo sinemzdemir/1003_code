@@ -27,15 +27,15 @@ import math
 from sklearn.model_selection import StratifiedKFold
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import roc_curve, auc
-from HoloProtRepAFPML import binary_evaluate
+from HoloProtRepAFPML import evaluate
 from sklearn.metrics import make_scorer
 from sklearn import metrics
-from HoloProtRepAFPML import binary_pytorch_network
+from HoloProtRepAFPML import pytorch_network
 
 
 def Automated_prediction_function(model,integrated_dataframe):
     
-    ###########data ismi nasil kaydedilecek representation name
+    
     label_list = list(integrated_dataframe['Label'])
     protein_representation = integrated_dataframe.drop(["Label", "Entry"], axis=1)
     proteins=list(integrated_dataframe['Entry'])

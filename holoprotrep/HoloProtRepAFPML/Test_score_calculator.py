@@ -135,15 +135,36 @@ def create_valid_kfold_object_for_multilabel_splits(X,y,kf):
         else:
             return kf
 
+
+
+def neural_network_eval(f_max_cv,kf,model,protein_representation,model_label_pred_lst,label_lst,index_,representation_name,classifier_name,protein_and_representation_dictionary,file_name,eval_type,protein_name,path,parameter):
+    best_param_list=[]
+    representation_name_concated="_".join(representation_name)
+    paths=path+'/'+eval_type+'/'+representation_name_concated+'_'+classifier_name+'_'+"multilabel_classifier"+".pt"
+    torch.save(model.state_dict(), paths)
+    representation_name_concated='_'.join(representation_name)          
+    best_parameter_dataframe=pd.DataFrame(parameter)
+    best_parameter_dataframe.to_csv(path+'/'+eval_type+'/'+"Neural_network"+'_'+representation_name_concated+'_'+"multilabel_classifier"+'_best_parameter' +'.csv',index=False)
+    evaluate.evaluate(kf, protein_representation, model_label_pred_lst, label_lst,f_max_cv, classifier_name,representation_name_concated,protein_and_representation_dictionary,file_name,index_,eval_type,"multilabel")
+    
+
+    
+    col_names=["Label"]
+    label_predictions=pd.DataFrame(columns=col_names)
+    label_predictions.append(pd.DataFrame({"Label":list(np.concatenate(model_label_pred_lst))}))    
+    label_predictions.insert(0, "protein_id", protein_name)                  
+    label_predictions.to_csv(path+'/'+eval_type+'/'+representation_name_concated +'_'+"multilabel_classifier"+ '_' + classifier_name+'_' +eval_type+ "_predictions.tsv",sep="\t", index=False)
+
+
 import ast
-def Model_test(representation_name,name_of_go_id_with_protein_names, integrated_dataframe,parameteter_file):
+def Model_test(representation_name,integrated_dataframe,parameteter_file):
     
     parameters=parameteter_file
-    label_list=[label for label in integrated_dataframe[0]['Label']]
+    label_list=[label for label in integrated_dataframe['Label']]
     
-    #label_list = [ast.literal_eval(label) for label in integrated_dataframe[0]['Label']]
-    protein_representation = integrated_dataframe[0].drop(["Label", "Entry"], axis=1)
-    proteins=list(integrated_dataframe[0]['Entry'])
+    #label_list = [ast.literal_eval(label) for label in integrated_dataframe['Label']]
+    protein_representation = integrated_dataframe.drop(["Label", "Entry"], axis=1)
+    proteins=list(integrated_dataframe['Entry'])
     vectors=list(protein_representation['Vector'])
     protein_and_representation_dictionary=dict(zip(proteins,vectors ))
     row = protein_representation.shape[0]
@@ -159,44 +180,44 @@ def Model_test(representation_name,name_of_go_id_with_protein_names, integrated_
         os.makedirs(path+"/test",exist_ok=True)         
     classifier_name_lst=[]
     index=0
-    for i in range(len(parameters)):
-        classifier_name_lst.append(parameters[i]['classifier_name'][0][0])
+    for i in range(len(parameters)):    
+        classifier_name_lst.append(parameters.iloc[i]["classifier_name"])
     #classifier_len=len( classifier_name_lst )
     file_name = "_" 
     file_name.join(classifier_name_lst)
-           
+         
     for i in range(len(parameters)):
         label_lst=[]
         model_label_pred_lst=[]
-        if (parameters[i]['classifier_name'][0]=='RandomForestClassifier'):
+        if (parameters.iloc[i]['classifier_name']=='RandomForestClassifier'):
             classifier_name='RandomForestClassifier'
             classifier_name_lst.append(classifier_name)            
-            #params=ast.literal_eval(parameters[i]['best parameter'][0])
-            params=parameters[i]['best parameter'][0]
+            #params=ast.literal_eval(parameters.iloc[i]['best parameter'][0])
+            params=parameters.iloc[i]['best parameter']
             classifier=RandomForestClassifier(max_depth=params['model_classifier__estimator__max_depth'],min_samples_leaf=params['model_classifier__estimator__min_samples_leaf'],n_estimators=params['model_classifier__estimator__n_estimators'])
             classifier_multilabel = OneVsRestClassifier(classifier, n_jobs=-1)
             model_pipline = Pipeline([('scaler', StandardScaler()), ('model_classifier', classifier_multilabel)])
             index=index+1
-        elif (parameters[i]['classifier_name'][0]=='SVC'):
+        elif (parameters.iloc[i]['classifier_name']=='SVC'):
             classifier_name='SVC'
             classifier_name_lst.append(classifier_name)            
-            params=ast.literal_eval(parameters[i]['best parameter'][0])
+            params=ast.literal_eval(parameters.iloc[i]['best parameter'][0])
             classifier=SVC(C=params['model_classifier__estimator__C'],gamma=params['model_classifier__estimator__gamma'],kernel=params['model_classifier__estimator__kernel'],max_iter=params['model_classifier__estimator__max_iter'])
             classifier_multilabel = OneVsRestClassifier(classifier, n_jobs=-1)
             model_pipline = Pipeline([('scaler', StandardScaler()), ('model_classifier', classifier_multilabel)])
             index=index+1    
-        elif (parameters[i]['classifier_name'][0]=='KNeighborsClassifier'):
+        elif (parameters.iloc[i]['classifier_name']=='KNeighborsClassifier'):
             classifier_name='KNeighborsClassifier'
             classifier_name_lst.append(classifier_name)
-            params=ast.literal_eval(parameters[i]['best parameter'][0])
+            params=ast.literal_eval(parameters.iloc[i]['best parameter'][0])
             up_limit = int(math.sqrt(int(len(model_label) / 5)))
             k_range = list(range(1, up_limit))
             classifier=KNeighborsClassifier(n_neighbors=params['model_classifier__n_neighbors'],weights=params['model_classifier__weights'],algorithm=params['model_classifier__algorithm'],leaf_size=params['model_classifier__leaf_size'])
             model_pipline = Pipeline([('scaler', StandardScaler()), ('model_classifier', classifier)])
             index=index+1
-        elif (parameters[i]['classifier_name'][0]=='Fully Connected Neural Network'):
+        elif (parameters.iloc[i]['classifier_name']=='Fully Connected Neural Network'):
             m=0
-            classifier_name='Neural_Network'
+            classifier_name='Fully Connected Neural Network'
             classifier_name_lst.append(classifier_name)          
             input_size= len(protein_representation_array[0])
             for ii in model_label:
@@ -208,44 +229,19 @@ def Model_test(representation_name,name_of_go_id_with_protein_names, integrated_
         kf=create_valid_kfold_object_for_multilabel_splits(protein_representation,model_label,kf)
 
         
-        if (classifier_name== "Neural_Network"):
+        if (classifier_name== "Fully Connected Neural Network"):
             
             input_size= len(protein_representation_array[0])
             m=0
             protein_name=[]  
-            for fold_train_index, fold_test_index in kf.split(protein_representation, model_label):
-                for i in model_label[fold_test_index]:
-                    if len(i)>m :
-                        class_number= len(i)
-            
-                protein_representation_fold=pd.DataFrame(protein_representation['Vector'],index=list(fold_test_index))
-                rep_name_and_go_id=representation_name+'_'+name_of_go_id_with_protein_names
-                model_label_pred,parameter,model = pytorch_network.NN(protein_representation_fold['Vector'],model_label[fold_test_index],input_size,class_number,rep_name_and_go_id)
-                model_label_pred_lst.append(model_label_pred.detach().numpy())
-                label_lst.append(model_label[fold_test_index])
-                for vec in protein_representation_array[fold_test_index]:
-                    for protein, vector in protein_and_representation_dictionary.items():  
-                        if str(vector) == str(list(vec)):
-                            protein_name.append(protein)
-                            continue
-                fmax = 0.0
-                tmax = 0.0
-                for t in range(1, 101):
-                    threshold = t / 100.0
-                    fscore=evaluate_annotation_f_max( model_label[fold_test_index],model_label_pred )
-                    if fmax < fscore:
-                        fmax = fscore
-                        tmax = threshold
-                f_max_cv.append(fmax)
-            
            
-            paths=path+"/test"+'/'+representation_name+'_'+name_of_go_id_with_protein_names+'_'+classifier_name+".pt"
+            f_max_cv_train,f_max_cv_test,model,model_label_pred_lst,label_lst,protein_name_tr,parameter,protein_name,parameter,model_label_pred_test_lst,label_lst_test = NN(kf,protein_representation,model_label,input_size,representation_name,protein_and_representation_dictionary)      
+            
+            neural_network_eval(f_max_cv_test,kf,model,protein_representation,model_label_pred_test_lst,label_lst_test,index,representation_name,classifier_name,protein_and_representation_dictionary,file_name,"test",protein_name,path,parameter )
+            
+            paths=path+"/test"+'/'+representation_name+'_'+classifier_name+".pt"
             torch.save(model,paths )
-           
-            
-                 
-#            evaluate.evaluate(kf, mlt, protein_representation, model_label_pred_lst, label_lst, classifier_name,representation_name,protein_and_representation_dictionary,f_max_cv##,file_name,index)
-                       
+    
         else:
             protein_name=[]  
             model_label_pred = cross_val_predict(model_pipline, protein_representation_array,model_label, cv=kf, n_jobs=-1)  
@@ -268,16 +264,12 @@ def Model_test(representation_name,name_of_go_id_with_protein_names, integrated_
                         fmax = fscore
                         tmax = threshold
                 f_max_cv.append(fmax)
-                rep_name_and_go_id=representation_name+'_'+name_of_go_id_with_protein_names
-        col_names=mlt.classes_
-        label_predictions=pd.DataFrame(np.concatenate(model_label_pred_lst),columns=col_names)
-        ls=np.concatenate(model_label_pred_lst)
-        label_predictions.insert(0, "protein_id", protein_name)
-        label_predictions["prediction_values"]=[i for i in ls]      
-        
-        label_predictions.to_csv(path+'/'+'test'+'/'+rep_name_and_go_id + '_' + classifier_name +'_test'+ "_predictions5cv.tsv",sep="\t", index=False)
-       
-        evaluate.evaluate(kf, mlt, protein_representation, model_label_pred_lst, label_lst, classifier_name,representation_name,name_of_go_id_with_protein_names,protein_and_representation_dictionary,f_max_cv,file_name,index,"test")
+                
+            col_names=mlt.classes_
+            label_predictions=pd.DataFrame(np.concatenate(model_label_pred_lst),columns=col_names)
+            ls=np.concatenate(model_label_pred_lst)
+            label_predictions.insert(0, "protein_id", protein_name)
+            label_predictions["prediction_values"]=[i for i in ls]              
+            label_predictions.to_csv(path+'/'+'test'+'/'+representation_name + '_' + classifier_name +'_test'+ "_predictions.tsv",sep="\t", index=False)       
+            evaluate.evaluate(kf,protein_representation, model_label_pred_lst, label_lst,f_max_cv, classifier_name,representation_name,protein_and_representation_dictionary,file_name,index,"test","multilabel")
             
-
-    
