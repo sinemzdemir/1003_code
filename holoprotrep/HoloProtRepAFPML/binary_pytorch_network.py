@@ -115,9 +115,18 @@ def NN(kf,protein_representation,model_label, input_size,representation_name,pro
                 val_loss_lst.append(epoch_loss)         
         
         running_loss_lst_s.append(running_loss_lst)
-        output[output >= 0.0] = 1
+        output[output >= 0.0] = 1  #training
         output[output < 0.0] = 0   
-         
+        
+        fmax_train= 0.0
+        tmax_train = 0.0
+        for k in range(1, 101):
+            threshold = k / 100.0
+            fscore=BinaryTrainModelsWithHyperParameterOptimization.evaluate_annotation_f_max( y,output )
+            if fmax_train < fscore:
+                fmax_train = fscore
+                tmax_train = threshold
+        f_max_cv_train.append(fmax_train) 
         val_loss_lst_s.append(val_loss_lst)
         model_label_pred_lst.append(output.detach().numpy())
         label_lst.append(model_label[fold_train_index])
@@ -144,21 +153,13 @@ def NN(kf,protein_representation,model_label, input_size,representation_name,pro
         
         for t in range(1, 101):
             threshold = t / 100.0
-            fscore=BinaryTrainModelsWithHyperParameterOptimization.evaluate_annotation_f_max( model_label[fold_test_index],y_test )
+            fscore=BinaryTrainModelsWithHyperParameterOptimization.evaluate_annotation_f_max( y_test,out_probs)
             if fmax < fscore:
                 fmax = fscore
                 tmax = threshold
-            f_max_cv_test.append(fmax)
+        f_max_cv_test.append(fmax)
             
-        fmax_test= 0.0
-        tmax_test = 0.0
-        for t in range(1, 101):
-            threshold = t / 100.0
-            fscore=BinaryTrainModelsWithHyperParameterOptimization.evaluate_annotation_f_max( model_label[fold_train_index],y )
-            if fmax_test < fscore:
-                fmax_test = fscore
-                tmax_test = threshold
-            f_max_cv_train.append(fmax_test)
+       
             
     test_loss=[sum(x) for x in zip(*val_loss_lst_s)]
     training_loss=[sum(x) for x in zip(*running_loss_lst_s)]

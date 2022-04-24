@@ -55,21 +55,20 @@ from HoloProtRepAFPML.binary_pytorch_network import NN
 import torch
 import joblib
 
+from sklearn.metrics import make_scorer
 
 # for calculating f_max intersection of predictions with labels for tn,tp calculation
-
 def intersection(real_annot, pred_annot):
-    
     count=0
     tn=0
     tp=0
-    #for i in range(len(real_annot)):
-    if(real_annot==pred_annot):
-        if(real_annot==0):
-            tn+=1
-        else:
-            tp+=1
-        count+=1
+    for i in range(len(real_annot)):
+        if(real_annot[i]==pred_annot[i]):
+            if(real_annot[i]==0):
+                tn+=1
+            else:
+                tp+=1
+            count+=1
                 
     return tn,tp
 
@@ -86,21 +85,18 @@ def scoring_f_max(lst):
     protein_representation_array=lst[1]
     real_annots=lst[2]
     pred_annots=model_pipline.predict(protein_representation_array)
-    for i in range(len(real_annots)):
- 
-        tn,tp=intersection(real_annots[i], pred_annots[i])
-        fp = pred_annots[i] - tp
-        fn = real_annots[i] - tn
-        total += 1
-        recall = tp /(1.0 * (tp + fn))
-        r += recall
-        p_total += 1
-        precision = tp / (1.0 * (tp + fp))
-        p += precision
-    
-    r /= total
-    if p_total > 0:
-        p /= p_total
+   
+    tn,tp=intersection(real_annots, pred_annots)
+    fp = list(pred_annots).count(1) - tp
+    fn = list(real_annots).count(0) - tn
+    total += 1
+    recall = tp /(1.0 * (tp + fn))
+    r += recall
+        #if len(pred_annots[i]) > 0:
+    p_total += 1
+    precision = tp / (1.0 * (tp + fp))
+    p += precision
+   
     f = 0.0
     if p + r > 0:
         f = 2 * p * r / (p + r)
@@ -109,34 +105,30 @@ def scoring_f_max(lst):
 
 #f_max scoring function
 def evaluate_annotation_f_max(real_annots, pred_annots):
-    
     total = 0
     p = 0.0
     r = 0.0
     p_total= 0
     tn=0
     tp=0
-    for i in range(len(real_annots)):
-
-        tn,tp=intersection(real_annots[i], pred_annots[i])
-        fp = pred_annots[i] - tp
-        fn = real_annots[i] - tn
-        total += 1
-        recall = tp /(1.0 * (tp + fn))
-        r += recall
-        p_total += 1
-        precision = tp / (1.0 * (tp + fp))
-        p += precision
     
-    r /= total
-    if p_total > 0:
-        p /= p_total
+    tn,tp=intersection(real_annots, pred_annots)
+    fp = list(pred_annots).count(1) - tp
+    fn = list(real_annots).count(0) - tn
+    total += 1
+    #recall = tp /(1.0 * (tp + fn))
+    recall = tp /(1.0 +(tp + fn))
+    r += recall
+    p_total += 1
+    #precision = tp / (1.0 * (tp + fp))
+    precision = tp / (1.0 +(tp + fp))
+    p += precision
+    
     f = 0.0
     if p + r > 0:
         f = 2 * p * r / (p + r)
     
     return f
-    
 #if every fold contains at least 2 positive samples return true,otherwise return false    
 def check_for_at_least_two_class_sample_exits(y):
 
@@ -253,7 +245,7 @@ def select_best_model_with_hyperparameter_tuning(representation_name,integrated_
             parameters = {'model_classifier__n_neighbors' : k_range,'model_classifier__weights' : ["uniform", "distance"], 'model_classifier__algorithm':['auto','ball_tree','kd_tree','brute'],'model_classifier__leaf_size':list(range(1,int(len(model_label_array)/5))),'model_classifier__p':[1,2]}
       
         kf = KFold(n_splits=5, shuffle=True, random_state=42)        
-        kf=create_valid_kfold_object_for_multilabel_splits(protein_representation,model_label,kf)
+        # kf=create_valid_kfold_object_for_multilabel_splits(protein_representation,model_label,kf)
         if(classifier== "Fully Connected Neural Network"):
             model_count=model_count+1
             #classifier_name_lst.append("Neural_Network")
@@ -277,7 +269,9 @@ def select_best_model_with_hyperparameter_tuning(representation_name,integrated_
             
         else:
             model_count=model_count+1        
-                                  
+            
+      
+                       
             model_tunning = GridSearchCV(estimator=model_pipline, param_grid=parameters, cv=kf,pre_dispatch = 20,scoring=scoring_f_max, n_jobs=-1)            
             classifier_name_lst.append(classifier_name)        
             model_tunning.fit(protein_representation_array, model_label)            
