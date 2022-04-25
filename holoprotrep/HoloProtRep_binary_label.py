@@ -82,7 +82,7 @@ if "model_training" in choice_of_task_name:
     if "prepare_datasets" in choice_of_task_name:
         for data_preproceed in datapreprocessed_lst:
                                
-            best_param=BinaryTrainModelsWithHyperParameterOptimization.select_best_model_with_hyperparameter_tuning(representation_names,data_preproceed,data["parameters"]["model_training"]["classifier_name"],scoring_func,data["parameters"]["model_training"]["auto"])
+            best_param=BinaryTrainModelsWithHyperParameterOptimization.select_best_model_with_hyperparameter_tuning(representation_names,data_preproceed,scoring_func,data["parameters"]["model_training"]["classifier_name"],data["parameters"]["model_training"]["auto"])
             
             if "model_test" in choice_of_task_name:
                 binary_Test_score_calculator.Model_test(representation_names,data_preproceed,best_param)
