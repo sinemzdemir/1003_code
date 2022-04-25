@@ -1,5 +1,5 @@
 parameters:
-    choice_of_task_name:  [model_training]
+    choice_of_task_name:  [prediction]
     fuse_representations:
         representation_files: [/media/DATA2/sinem/HoloProtReti_modal_rep_ae_multi_col_256.csv]
         min_fold_number:  None
@@ -12,19 +12,14 @@ parameters:
     
     model_training:
         representation_names:  [modal_rep_ae]
-        scoring_function:  ["f1_micro"]   
-        auto:  True
+        scoring_function:  ["f1_micro"]  
         prepared_path:  ["/media/DATA/home/sinem/Code/1003_code/results/modal_rep_ae_binary_data.pickle"]
-        classifier_name:  ["SVC"] 
-    model_test:
-        representation_names:  []
-        prepared_path:  []              
-        best_parameter_file:  []
-        
+        classifier_name:  ['Fully_Connected_Neural_Network'] 
+   
     prediction:
         representation_names:  [modal_rep_ae]
         scoring_func:  [] 
         prepared_path:  ["/media/DATA/home/sinem/yayin_calismasi/rep_file/rep_dif_ae.csv"]
         classifier_name:  ['Fully Connected Neural Network']         
-        model_directory:  ["/media/DATA/home/sinem/yayin_calismasi/results/test/modal_rep_ae_binary_classifier_Fully Connected Neural Network.pt"] 
+        model_directory:  ["/media/DATA/home/sinem/Code/1003_code/results/test/modal_rep_ae_Fully_Connected_Neural_Network_binary_classifier.pt"] 
         

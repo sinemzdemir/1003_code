@@ -30,7 +30,7 @@ from HoloProtRepAFPML import binary_evaluate
 import joblib
 from sklearn.metrics import make_scorer
 from sklearn import metrics
-from HoloProtRepAFPML import AutomatedFunctionPredictionML
+#from HoloProtRepAFPML import AutomatedFunctionPredictionML
 from HoloProtRepAFPML import binary_pytorch_network
 from  HoloProtRepAFPML.binary_pytorch_network import NN
 import ast

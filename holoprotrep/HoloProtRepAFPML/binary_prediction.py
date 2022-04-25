@@ -31,9 +31,7 @@ from HoloProtRepAFPML import binary_evaluate
 import joblib
 from sklearn.metrics import make_scorer
 from sklearn import metrics
-from HoloProtRepAFPML import AutomatedFunctionPredictionML
 from HoloProtRepAFPML import binary_pytorch_network
-#from  HoloProtRepAFPML.pytorch_network import NN
 from sklearn.preprocessing import StandardScaler
 import copy
 def make_prediction(representation_name,data_preproceed,tested_model,classifier_name):
@@ -45,8 +43,8 @@ def make_prediction(representation_name,data_preproceed,tested_model,classifier_
     protein_and_representation_dictionary=dict(zip(proteins,vectors ))
     row = protein_representation.shape[0]
     row_val = round(math.sqrt(row), 0)
-    label_list = [ast.literal_eval(label) for label in protein_representation['Vector']]  
-    protein_representation_array = np.array(label_list, dtype=float)    
+    representation_vector = [ast.literal_eval(label) for label in protein_representation['Vector']]  
+    protein_representation_array = np.array(representation_vector, dtype=float)    
     f_max_cv = []  
     path=os.path.dirname(os.getcwd())+'/results'
     if 'prediction'  not in os.listdir(path):
@@ -62,20 +60,20 @@ def make_prediction(representation_name,data_preproceed,tested_model,classifier_
             #params=ast.literal_eval(parameters[i]['best parameter'][0])
             model = joblib.load(tested_model[i])
             sc = StandardScaler()
-            label_list_std = sc.fit_transform(label_list)           
-            model_label_pred_lst=model.predict(label_list_std)   
+            representation_vector_std = sc.fit_transform(representation_vector)           
+            model_label_pred_lst=model.predict(representation_vector_std)   
             index=index+1
         elif (classifier_name[i]=='SVC'):
                     
             #params=ast.literal_eval(parameters[i]['best parameter'][0])
             model = joblib.load(tested_model[i])
             
-            model_label_pred_lst=model.predict(label_list)   
+            model_label_pred_lst=model.predict(representation_vector)   
         elif (classifier_name[i]=='KNeighborsClassifier'):
                          
             #params=ast.literal_eval(parameters[i]['best parameter'][0])
             model = joblib.load(tested_model[i])           
-            model_label_pred_lst=model.predict(label_list)   
+            model_label_pred_lst=model.predict(representation_vector)   
       
      
         if (classifier_name[i]== "Fully Connected Neural Network"):
@@ -86,7 +84,7 @@ def make_prediction(representation_name,data_preproceed,tested_model,classifier_
             model_class=binary_pytorch_network.model_call(input_size,class_num)
             model_class.load_state_dict(copy.deepcopy(torch.load(tested_model[i])))
             model_class.eval()
-            x = torch.tensor(label_list)
+            x = torch.tensor(representation_vector)
             x=x.double()
             model_label_pred_lst=model_class(x) 
             model_label_pred_lst[model_label_pred_lst >= 0.] = 1    

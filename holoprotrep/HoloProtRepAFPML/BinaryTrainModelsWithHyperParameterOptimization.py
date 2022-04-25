@@ -52,6 +52,7 @@ from sklearn.metrics import make_scorer
 from sklearn import metrics
 from HoloProtRepAFPML import binary_pytorch_network
 from HoloProtRepAFPML.binary_pytorch_network import NN
+from HoloProtRepAFPML import binary_prediction
 import torch
 import joblib
 
@@ -75,10 +76,6 @@ def intersection(real_annot, pred_annot):
 # gridsearchcv scoring function which contains prediction evaluation
 def scoring_f_max(lst):
 
-    total = 0
-    p = 0.0
-    r = 0.0
-    p_total= 0
     tn=0
     tp=0
     model_pipline=lst[0]
@@ -89,44 +86,30 @@ def scoring_f_max(lst):
     tn,tp=intersection(real_annots, pred_annots)
     fp = list(pred_annots).count(1) - tp
     fn = list(real_annots).count(0) - tn
-    total += 1
     recall = tp /(1.0 * (tp + fn))
-    r += recall
-        #if len(pred_annots[i]) > 0:
-    p_total += 1
     precision = tp / (1.0 * (tp + fp))
-    p += precision
-   
     f = 0.0
-    if p + r > 0:
-        f = 2 * p * r / (p + r)
+    if precision + recall > 0:
+        f = 2 * precision * recall / (precision + recall)
     
     return f
 
 #f_max scoring function
 def evaluate_annotation_f_max(real_annots, pred_annots):
-    total = 0
-    p = 0.0
-    r = 0.0
-    p_total= 0
+
     tn=0
     tp=0
     
     tn,tp=intersection(real_annots, pred_annots)
     fp = list(pred_annots).count(1) - tp
     fn = list(real_annots).count(0) - tn
-    total += 1
-    #recall = tp /(1.0 * (tp + fn))
+    
     recall = tp /(1.0 +(tp + fn))
-    r += recall
-    p_total += 1
-    #precision = tp / (1.0 * (tp + fp))
     precision = tp / (1.0 +(tp + fp))
-    p += precision
     
     f = 0.0
-    if p + r > 0:
-        f = 2 * p * r / (p + r)
+    if precision + recall> 0:
+        f = 2 * precision * recall / (precision + recall)
     
     return f
 #if every fold contains at least 2 positive samples return true,otherwise return false    
@@ -164,14 +147,12 @@ def create_valid_kfold_object_for_multilabel_splits(X,y,kf):
             return kf
             
             
-def neural_network_eval(f_max_cv,kf,model,protein_representation,model_label_pred_lst,label_lst,index_,representation_name,classifier_name,protein_and_representation_dictionary,file_name,eval_type,protein_name,path,auto,parameter):
+def neural_network_eval(f_max_cv,kf,model,protein_representation,model_label_pred_lst,label_lst,index_,representation_name,classifier_name,protein_and_representation_dictionary,file_name,eval_type,protein_name,path,parameter):
   
     representation_name_concated="_".join(representation_name)
     paths=path+'/'+eval_type+'/'+representation_name_concated+'_'+classifier_name+'_'+"binary_classifier"+".pt"
     torch.save(model.state_dict(), paths)
-    if auto==True:
-        best_param_list.append(parameter) 
-           
+    
     representation_name_concated='_'.join(representation_name)          
     best_parameter_dataframe=pd.DataFrame(parameter)
     best_parameter_dataframe.to_csv(path+'/'+eval_type+'/'+"Neural_network"+'_'+representation_name_concated+'_'+"binary_classifier"+'_best_parameter' +'.csv',index=False)
@@ -184,7 +165,7 @@ def neural_network_eval(f_max_cv,kf,model,protein_representation,model_label_pre
     
 best_param_list=[]    
 
-def select_best_model_with_hyperparameter_tuning(representation_name,integrated_lst,scoring_key,models=["RandomForestClassifier",'SVC',"KNeighborsClassifier",'Fully Connected Neural Network'],auto=True):
+def select_best_model_with_hyperparameter_tuning(representation_name,integrated_lst,scoring_key,models=["RandomForestClassifier",'SVC',"KNeighborsClassifier",'Fully_Connected_Neural_ Network']):
     scoring_function_dictionary={"f1_micro":"f1_micro","f1_macro":"f1_macro","f1_weighted":"f1_weighted","f_max":scoring_f_max}
     class_len=len(models)
     integrated_dataframe=integrated_lst[0]
@@ -198,11 +179,11 @@ def select_best_model_with_hyperparameter_tuning(representation_name,integrated_
     row_val = round(math.sqrt(row), 0)
     protein_representation_array = np.array(list(protein_representation['Vector']), dtype=float)
     model_label_array = np.array(model_label)
-    predictions_list = []
+    predictions_list,result_dict,classifier_name_lst=([] for i in range(3))
+   
     best_parameter_df = pd.DataFrame(
     columns={"representation_name", 'classifier_name',  'best parameter'})
-    result_dict={}
-    classifier_name_lst=[]
+    
     index=0
     model_count=0
     representation_name_concated=""
@@ -215,9 +196,8 @@ def select_best_model_with_hyperparameter_tuning(representation_name,integrated_
     for classifier in models:            
         index+=1
         m=0
-        model_label_pred_lst=[]
-        label_lst=[]
-        protein_name=[]
+        model_label_pred_lst, label_lst, protein_name = ([] for i in range(3))
+       
         input_size= len(protein_representation_array[0])                       
         
         if classifier== "RandomForestClassifier":
@@ -245,27 +225,17 @@ def select_best_model_with_hyperparameter_tuning(representation_name,integrated_
             parameters = {'model_classifier__n_neighbors' : k_range,'model_classifier__weights' : ["uniform", "distance"], 'model_classifier__algorithm':['auto','ball_tree','kd_tree','brute'],'model_classifier__leaf_size':list(range(1,int(len(model_label_array)/5))),'model_classifier__p':[1,2]}
       
         kf = KFold(n_splits=5, shuffle=True, random_state=42)        
-        # kf=create_valid_kfold_object_for_multilabel_splits(protein_representation,model_label,kf)
-        if(classifier== "Fully Connected Neural Network"):
+        kf=create_valid_kfold_object_for_multilabel_splits(protein_representation,model_label,kf)
+        if(classifier== "Fully_Connected_Neural_Network"):
             model_count=model_count+1
             #classifier_name_lst.append("Neural_Network")
-            classifier_name="Fully Connected Neural Network"
-            f_max_cv = []
-            f_max_cv_train=[]
-            f_max_cv_test=[]
-            loss_train=[]
-            loss=[]   
-            loss_tr=[]
-            loss_test=[]
-            protein_name_tr=[]
-            model_label_pred_test_lst=[]
-            label_lst_test=[]
-            model_label_pred_lst=[]
+            classifier_name="Fully_Connected_Neural_Network"
+            f_max_cv,f_max_cv_train,f_max_cv_test,loss_train,loss,loss_tr,loss_test,protein_name_tr,model_label_pred_test_lst,label_lst_test,model_label_pred_lst= ([] for i in range(11))
             f_max_cv_train,f_max_cv_test,model,model_label_pred_lst,label_lst,protein_name_tr,parameter,protein_name,parameter,model_label_pred_test_lst,label_lst_test = NN(kf,protein_representation,model_label,input_size,representation_name,protein_and_representation_dictionary)      
+           
+            neural_network_eval(f_max_cv_train,kf,model,protein_representation,model_label_pred_lst,label_lst,index,representation_name,classifier_name,protein_and_representation_dictionary,file_name,"training",protein_name_tr,path,parameter)           
             
-            neural_network_eval(f_max_cv_train,kf,model,protein_representation,model_label_pred_lst,label_lst,index,representation_name,classifier_name,protein_and_representation_dictionary,file_name,"training",protein_name_tr,path,auto,parameter)           
-            
-            neural_network_eval(f_max_cv_test,kf,model,protein_representation,model_label_pred_test_lst,label_lst_test,index,representation_name,classifier_name,protein_and_representation_dictionary,file_name,"test",protein_name,path,auto,parameter)
+            neural_network_eval(f_max_cv_test,kf,model,protein_representation,model_label_pred_test_lst,label_lst_test,index,representation_name,classifier_name,protein_and_representation_dictionary,file_name,"test",protein_name,path,parameter)
             
         else:
             model_count=model_count+1        
@@ -309,12 +279,9 @@ def select_best_model_with_hyperparameter_tuning(representation_name,integrated_
             label_predictions.to_csv(path+'/'+'test'+'/'+representation_name_concated +'_'+ classifier_name+'_'+"binary_classifier" +'_test'+ "_predictions.tsv",sep="\t", index=False)        
             class_name='_'.join(classifier_name_lst)
             best_parameter_df.to_csv(path+'/'+'test'+'/'+representation_name_concated+'_'+class_name+'_'+"binary_classifier"+'_best_parameter' +'.csv',index=False)
-    if auto==True:
-        return best_param_list
-    else:
-        return None
-            
-
+   
+    return best_param_list
+   
 
 
     

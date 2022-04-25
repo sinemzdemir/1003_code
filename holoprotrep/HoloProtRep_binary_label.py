@@ -5,7 +5,6 @@ import tqdm
 from preprocess import Binary_DataSetPreprocess
 from preprocess import RepresentationFusion
 from HoloProtRepAFPML import BinaryTrainModelsWithHyperParameterOptimization
-#from HoloProtRepAFPML import AutomatedFunctionPredictionML
 from sklearn.utils import shuffle
 import os
 import pickle
@@ -82,7 +81,7 @@ if "model_training" in choice_of_task_name:
     if "prepare_datasets" in choice_of_task_name:
         for data_preproceed in datapreprocessed_lst:
                                
-            best_param=BinaryTrainModelsWithHyperParameterOptimization.select_best_model_with_hyperparameter_tuning(representation_names,data_preproceed,scoring_func,data["parameters"]["model_training"]["classifier_name"],data["parameters"]["model_training"]["auto"])
+            best_param=BinaryTrainModelsWithHyperParameterOptimization.select_best_model_with_hyperparameter_tuning(representation_names,data_preproceed,scoring_func,data["parameters"]["model_training"]["classifier_name"])
             
             if "model_test" in choice_of_task_name:
                 binary_Test_score_calculator.Model_test(representation_names,data_preproceed,best_param)
@@ -95,16 +94,8 @@ if "model_training" in choice_of_task_name:
         for data_preproceed in preprocesed_data_path:
             data_preproceed_pickle = open(data_preproceed, "rb")
             data_preproceed_df=pickle.load(data_preproceed_pickle)
-            best_param=BinaryTrainModelsWithHyperParameterOptimization.select_best_model_with_hyperparameter_tuning(data["parameters"]["model_training"]["representation_names"],data_preproceed_df,scoring_func,data["parameters"]["model_training"]["classifier_name"],data["parameters"]["model_training"]["auto"])   
-            if "model_test" in choice_of_task_name:
-                binary_Test_score_calculator.Model_test(representation_names,data_preproceed_df,best_param)
-if "model_test" in choice_of_task_name :
-    if "model_training" not in choice_of_task_name:
-       
-        for i in data["parameters"]["model_test"]["prepared_path"]:
-            test_data=pd.read_csv(i)
-            binary_Test_score_calculator.Model_test(data["parameters"]["model_test"]["representation_names"],test_data,data["parameters"]["model_test"]["best_parameter_file"])
-    
+            best_param=BinaryTrainModelsWithHyperParameterOptimization.select_best_model_with_hyperparameter_tuning(data["parameters"]["model_training"]["representation_names"],data_preproceed_df,scoring_func,data["parameters"]["model_training"]["classifier_name"])   
+            
 if "prediction" in choice_of_task_name :
     
         
@@ -118,4 +109,4 @@ if "prediction" in choice_of_task_name :
             representation_dataset.loc[index] = [test_data.iloc[index]['Entry']] + [list_of_floats]'''
         classifier_name_lst=data["parameters"]["prediction"]["classifier_name"]
         #representation_dataset.to_csv("/media/DATA/home/sinem/yayin_calismasi/results/representation_two_col_modal_rep_ae.csv")
-        binary_prediction.make_prediction(data["parameters"]["prediction"]["representation_names"],test_data,data["parameters"]["prediction"]["model_directory"],classifier_name_lst)
+        binary_prediction.make_prediction(data["parameters"]["prediction"]["representation_names"][0],test_data,data["parameters"]["prediction"]["model_directory"],classifier_name_lst)
