@@ -184,8 +184,8 @@ def neural_network_eval(f_max_cv,kf,model,protein_representation,model_label_pre
     
 best_param_list=[]    
 
-def select_best_model_with_hyperparameter_tuning(representation_name,integrated_lst,models=["RandomForestClassifier",'SVC',"KNeighborsClassifier",'Fully Connected Neural Network'],auto=True,total_run_count=1):
-     
+def select_best_model_with_hyperparameter_tuning(representation_name,integrated_lst,scoring_key,models=["RandomForestClassifier",'SVC',"KNeighborsClassifier",'Fully Connected Neural Network'],auto=True):
+    scoring_function_dictionary={"f1_micro":"f1_micro","f1_macro":"f1_macro","f1_weighted":"f1_weighted","f_max":scoring_f_max}
     class_len=len(models)
     integrated_dataframe=integrated_lst[0]
     model_label=np.array(integrated_dataframe['Label'])
@@ -269,10 +269,8 @@ def select_best_model_with_hyperparameter_tuning(representation_name,integrated_
             
         else:
             model_count=model_count+1        
-            
-      
-                       
-            model_tunning = GridSearchCV(estimator=model_pipline, param_grid=parameters, cv=kf,pre_dispatch = 20,scoring=scoring_f_max, n_jobs=-1)            
+                    
+            model_tunning = GridSearchCV(estimator=model_pipline, param_grid=parameters, cv=kf,pre_dispatch = 20,scoring=scoring_function_dictionary[scoring_key[0]], n_jobs=-1)            
             classifier_name_lst.append(classifier_name)        
             model_tunning.fit(protein_representation_array, model_label)            
             model_tunning.best_score_
