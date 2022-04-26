@@ -93,8 +93,8 @@ def scoring_f_max(lst):
     tn, tp = intersection(real_annots, pred_annots)
     fp = list(pred_annots).count(1) - tp
     fn = list(real_annots).count(0) - tn
-    recall = tp / (1.0 * (tp + fn))
-    precision = tp / (1.0 * (tp + fp))
+    recall = tp / (1.0 + (tp + fn))
+    precision = tp / (1.0 + (tp + fp))
     f = 0.0
     if precision + recall > 0:
         f = 2 * precision * recall / (precision + recall)
