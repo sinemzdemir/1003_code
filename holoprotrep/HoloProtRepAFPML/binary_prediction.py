@@ -76,7 +76,7 @@ def make_prediction(representation_name,data_preproceed,tested_model,classifier_
             model_label_pred_lst=model.predict(representation_vector)   
       
      
-        if (classifier_name[i]== "Fully Connected Neural Network"):
+        if (classifier_name[i]== "Fully_Connected_Neural_Network"):
             
            
             input_size= len(protein_representation_array[0])

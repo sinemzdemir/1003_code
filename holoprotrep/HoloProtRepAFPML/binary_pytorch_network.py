@@ -5,9 +5,11 @@ import torch.optim as optim
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 import numpy as np
 from HoloProtRepAFPML import BinaryTrainModelsWithHyperParameterOptimization
+
 
 class Net(nn.Module):
     def __init__(self, input_size, class_number):
@@ -30,14 +32,16 @@ class Net(nn.Module):
         x = self.fc7(x)
         return x
 
+
 def draw_curve(current_epoch):
     x_epoch.append(current_epoch)
-    ax0.plot(x_epoch, y_loss['train'], 'bo-', label='train')
-    ax0.plot(x_epoch, y_loss['val'], 'ro-', label='val')
- 
+    ax0.plot(x_epoch, y_loss["train"], "bo-", label="train")
+    ax0.plot(x_epoch, y_loss["val"], "ro-", label="val")
+
     if current_epoch == 0:
-        ax0.legend()       
-    fig.savefig('train.jpg')
+        ax0.legend()
+    fig.savefig("train.jpg")
+
 
 def model_call(input_size, class_number):
     model = Net(input_size, class_number)
@@ -47,34 +51,50 @@ def model_call(input_size, class_number):
     model.to(device)
     return model
 
-def NN(kf,protein_representation,model_label, input_size,representation_name,protein_and_representation_dictionary):
-    
-    running_loss_lst_s=[]
-    f_max_cv_train=[]
-    f_max_cv_test=[]
-    val_loss_lst_s=[]
-    protein_name=[]
+
+def NN(
+    kf,
+    protein_representation,
+    model_label,
+    input_size,
+    representation_name,
+    protein_and_representation_dictionary,
+):
+
+    running_loss_lst_s = []
+    f_max_cv_train = []
+    f_max_cv_test = []
+    val_loss_lst_s = []
+    protein_name = []
     f_max_cv = []
-    loss_train=[]
-    loss=[]   
-    loss_tr=[]
-    loss_test=[]
-    protein_name_tr=[]
-    model_label_pred_test_lst=[]
-    label_lst_test=[]
-    model_label_pred_lst=[]
+    loss_train = []
+    loss = []
+    loss_tr = []
+    loss_test = []
+    protein_name_tr = []
+    model_label_pred_test_lst = []
+    label_lst_test = []
+    model_label_pred_lst = []
     classifier_name = "Fully Connected Neural Network"
-    label_lst=[]
-    protein_representation_array = np.array(list(protein_representation['Vector']), dtype=float)
-    
-    for fold_train_index, fold_test_index in kf.split(protein_representation, model_label):
-        
-        running_loss_lst=[]       
-        class_number=1
-        x_df=pd.DataFrame(protein_representation['Vector'],index=list(fold_train_index))
-        x=x_df['Vector']
-        x_test_df=pd.DataFrame(protein_representation['Vector'],index=list(fold_test_index))
-        x_test=x_test_df['Vector']
+    label_lst = []
+    protein_representation_array = np.array(
+        list(protein_representation["Vector"]), dtype=float
+    )
+
+    for fold_train_index, fold_test_index in kf.split(
+        protein_representation, model_label
+    ):
+
+        running_loss_lst = []
+        class_number = 1
+        x_df = pd.DataFrame(
+            protein_representation["Vector"], index=list(fold_train_index)
+        )
+        x = x_df["Vector"]
+        x_test_df = pd.DataFrame(
+            protein_representation["Vector"], index=list(fold_test_index)
+        )
+        x_test = x_test_df["Vector"]
         model = Net(input_size, class_number)
         model = model.double()
         criterion = nn.BCEWithLogitsLoss()
@@ -88,95 +108,108 @@ def NN(kf,protein_representation,model_label, input_size,representation_name,pro
         x_test = x_test.double()
         y_test = torch.tensor(model_label[fold_test_index]).to(device)
         y_test = y_test.double()
-        val_loss_lst=[]
-        
+        val_loss_lst = []
+
         for epoch in range(900):
-        
-            #training
-            running_loss=0.0
+
+            # training
+            running_loss = 0.0
             output = model(x)
-            batch_loss  = criterion(output, y.unsqueeze(1))
+            batch_loss = criterion(output, y.unsqueeze(1))
             optimizer.zero_grad()
-            batch_loss.backward()        
+            batch_loss.backward()
             optimizer.step()
-            running_loss += batch_loss.item() #epoch loss
+            running_loss += batch_loss.item()  # epoch loss
             epoch_loss = running_loss / len(x)
             if epoch % 20 == 0:
                 print("Loss: {:.3f}".format(batch_loss.item()))
             running_loss_lst.append(epoch_loss)
-            #test
+            # test
             with torch.no_grad():
                 model.eval()
-                val_loss=0.0      
-                out_probs = model(x_test) 
-                loss_val  = criterion(out_probs, y_test.unsqueeze(1))    
+                val_loss = 0.0
+                out_probs = model(x_test)
+                loss_val = criterion(out_probs, y_test.unsqueeze(1))
                 val_loss += loss_val.item()
                 epoch_loss = running_loss / len(x_test)
-                val_loss_lst.append(epoch_loss)         
-        
+                val_loss_lst.append(epoch_loss)
+
         running_loss_lst_s.append(running_loss_lst)
-        output[output >= 0.0] = 1  #training
-        output[output < 0.0] = 0   
-        
-        fmax_train= 0.0
+        output[output >= 0.0] = 1  # training
+        output[output < 0.0] = 0
+
+        fmax_train = 0.0
         tmax_train = 0.0
         for k in range(1, 101):
             threshold = k / 100.0
-            fscore=BinaryTrainModelsWithHyperParameterOptimization.evaluate_annotation_f_max( y,output )
+            fscore = BinaryTrainModelsWithHyperParameterOptimization.evaluate_annotation_f_max(
+                y, output
+            )
             if fmax_train < fscore:
                 fmax_train = fscore
                 tmax_train = threshold
-        f_max_cv_train.append(fmax_train) 
+        f_max_cv_train.append(fmax_train)
         val_loss_lst_s.append(val_loss_lst)
         model_label_pred_lst.append(output.detach().numpy())
         label_lst.append(model_label[fold_train_index])
-        
+
         for vec in protein_representation_array[fold_train_index]:
-            for protein, vector in protein_and_representation_dictionary.items():  
+            for protein, vector in protein_and_representation_dictionary.items():
                 if str(vector) == str(list(vec)):
                     protein_name_tr.append(protein)
                     continue
-                
+
         out_probs[out_probs >= 0.0] = 1
-        out_probs[out_probs < 0.0] = 0       
-        
+        out_probs[out_probs < 0.0] = 0
+
         model_label_pred_test_lst.append(out_probs.detach().numpy())
         label_lst_test.append(model_label[fold_test_index])
-        
+
         for vec in protein_representation_array[fold_test_index]:
-            for protein, vector in protein_and_representation_dictionary.items():  
+            for protein, vector in protein_and_representation_dictionary.items():
                 if str(vector) == str(list(vec)):
                     protein_name.append(protein)
                     continue
         fmax = 0.0
         tmax = 0.0
-        
+
         for t in range(1, 101):
             threshold = t / 100.0
-            fscore=BinaryTrainModelsWithHyperParameterOptimization.evaluate_annotation_f_max( y_test,out_probs)
+            fscore = BinaryTrainModelsWithHyperParameterOptimization.evaluate_annotation_f_max(
+                y_test, out_probs
+            )
             if fmax < fscore:
                 fmax = fscore
                 tmax = threshold
         f_max_cv_test.append(fmax)
-            
-       
-            
-    test_loss=[sum(x) for x in zip(*val_loss_lst_s)]
-    training_loss=[sum(x) for x in zip(*running_loss_lst_s)]
-    plt.figure(figsize=(10,5))
+
+    test_loss = [sum(x) for x in zip(*val_loss_lst_s)]
+    training_loss = [sum(x) for x in zip(*running_loss_lst_s)]
+    plt.figure(figsize=(10, 5))
     plt.title("Training and Validation Loss")
-    plt.plot(test_loss,label="val")
-    plt.plot(training_loss,label="train")
+    plt.plot(test_loss, label="val")
+    plt.plot(training_loss, label="train")
     plt.xlabel("iterations")
     plt.ylabel("Loss")
     plt.legend()
     plt.show()
-    
+
     parameter = {
         "classifier_name": classifier_name,
         "criterion": [criterion],
         "optimizer": str(optimizer),
     }
-    
-    return f_max_cv_train,f_max_cv_test,model,model_label_pred_lst,label_lst,protein_name_tr,parameter,protein_name,parameter,model_label_pred_test_lst,label_lst_test
 
+    return (
+        f_max_cv_train,
+        f_max_cv_test,
+        model,
+        model_label_pred_lst,
+        label_lst,
+        protein_name_tr,
+        parameter,
+        protein_name,
+        parameter,
+        model_label_pred_test_lst,
+        label_lst_test,
+    )
