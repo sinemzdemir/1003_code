@@ -18,6 +18,11 @@ trains models and search for best model and hyperparameters.
 - The module implements ``train_model_with_datasets`` method. The method takes a dataframes as input.
 The function takes dataset directory as input, initialize relevant parameters, calls training and reporting functions.
 It is basicly acts as an API for this module.
+
+- The module implements ``scoring_f_max`` method. The method takes a list as input.The List consist of model pipline,real annotation numpy array and protein vector dataframe
+The function , call intersection function for true positive and true negative value calculation.It calculates f score
+
+
 """
 # import tensorflow as tf
 import ast
@@ -80,7 +85,7 @@ def intersection(real_annot, pred_annot):
     return tn, tp
 
 
-# gridsearchcv scoring function which contains prediction evaluation
+# gridsearchcv scoring function which contains annotation prediction 
 def scoring_f_max(lst):
 
     tn = 0
@@ -100,7 +105,23 @@ def scoring_f_max(lst):
         f = 2 * precision * recall / (precision + recall)
 
     return f
+def scoring_f_max_machine(model_pipline,protein_representation_array,real_annots):
 
+    tn=0
+    tp=0
+    
+    pred_annots=model_pipline.predict(protein_representation_array)
+   
+    tn,tp=intersection(real_annots, pred_annots)
+    fp = list(pred_annots).count(1) - tp
+    fn = list(real_annots).count(0) - tn
+    recall = tp /(1.0 + (tp + fn))
+    precision = tp / (1.0 + (tp + fp))
+    f = 0.0
+    if precision + recall > 0:
+        f = 2 * precision * recall / (precision + recall)
+    
+    return f
 
 # f_max scoring function
 def evaluate_annotation_f_max(real_annots, pred_annots):
@@ -137,7 +158,7 @@ def check_for_at_least_two_class_sample_exits(y):
     return True
 
 
-# kfold every fold should have at least 2 positive sample  neden 2?
+
 def create_valid_kfold_object_for_multilabel_splits(X, y, kf):
 
     check_for_at_least_two_class_sample_exits(y)
@@ -482,14 +503,10 @@ def select_best_model_with_hyperparameter_tuning(
         else:
             model_count = model_count + 1
 
-            model_tunning = GridSearchCV(
-                estimator=model_pipline,
-                param_grid=parameters,
-                cv=kf,
-                pre_dispatch=20,
-                scoring=scoring_function_dictionary[scoring_key[0]],
-                n_jobs=-1,
-            )
+            if(scoring_key[0] =="f_max"):        
+                model_tunning = GridSearchCV(estimator=model_pipline, param_grid=parameters, cv=kf,pre_dispatch = 20,scoring=scoring_f_max_machine  , n_jobs=-1)
+            else:
+                model_tunning = GridSearchCV(estimator=model_pipline, param_grid=parameters, cv=kf,pre_dispatch = 20,scoring=scoring_function_dictionary[scoring_key[0]] , n_jobs=-1)   
             classifier_name_lst.append(classifier_name)
             model_tunning.fit(protein_representation_array, model_label)
             model_tunning.best_score_
