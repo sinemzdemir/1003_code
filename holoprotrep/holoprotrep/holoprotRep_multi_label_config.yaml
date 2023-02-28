@@ -1,0 +1,22 @@
+parameters:
+    choice_of_task_name:  [model_test]
+    representation_names:  [seqvec, tcga]
+    fuse_representations:
+        representation_files: [/media/DATA/home/sinem/yayin_calismasi/SeqVec_dataframe_multi_col.csv, /media/DATA/home/sinem/yayin_calismasi/tcga_embedding_dataframe_multi_col.csv]
+       
+    prepare_datasets:  
+        annotation_files:  [/media/DATA/home/sinem/yayin_calismasi/holoprotrep/BP_Low_Shallow.tsv]
+        prepared_representation_file:  /media/DATA/home/sinem/yayin_calismasi/results/seqvec_tcga_fused_representations_dataframe_multi_col.csv
+        
+    
+    model_training:
+       
+        auto:  True
+        prepared_directory_path:  [/media/DATA/home/sinem/yayin_calismasi/results/]
+        classifier_name:  ["Fully Connected Neural Network","RandomForestClassifier"] 
+    model_test:
+        classifier_name:  ["Fully Connected Neural Network","RandomForestClassifier"] 
+        prepared_directory_path:  [/media/DATA/home/sinem/yayin_calismasi/results/]              
+        best_parameter_file:  ["/media/DATA/home/sinem/1003_code/results/training/Neural_network_s_e_q_v_e_c___t_c_g_a_multilabel_classifier_best_parameter.csv"] 
+    
+
